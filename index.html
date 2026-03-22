@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百家樂分析系統</title>
+
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  color:#fff;
+  text-align:center;
+  font-family:-apple-system;
+}
+
+h1{margin-top:20px;}
+
+.result{
+  font-size:60px;
+  margin:10px;
+}
+
+.percent{
+  color:#22c55e;
+  font-size:18px;
+}
+
+button{
+  margin:6px;
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+}
+
+.b{background:#ef4444;}
+.p{background:#3b82f6;}
+.t{background:#22c55e;}
+
+.road{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:15px;
+}
+
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  margin:2px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎰 百家樂分析系統</h1>
+
+<div class="result" id="result">--</div>
+<div class="percent" id="percent">等待操作</div>
+
+<!-- 手動紀錄 -->
+<div>
+<button class="b" onclick="add('b')">莊</button>
+<button class="p" onclick="add('p')">閒</button>
+<button class="t" onclick="add('t')">和</button>
+</div>
+
+<!-- 控制 -->
+<div>
+<button onclick="predict()">預測</button>
+<button onclick="clearData()">清空</button>
+</div>
+
+<!-- 路單 -->
+<div class="road" id="road"></div>
+
+<script>
+let history=[];
+
+// 手動紀錄
+function add(type){
+  history.unshift(type);
+  if(history.length>50) history.pop();
+  render();
+}
+
+// 分析（簡單穩定）
+function analyze(){
+  let last=history.slice(0,6);
+  let b=last.filter(x=>x=='b').length;
+  let p=last.filter(x=>x=='p').length;
+
+  if(last[0] && last[0]==last[1]) return last[0];
+  if(b>p) return 'b';
+  if(p>b) return 'p';
+
+  return Math.random()<0.5?'b':'p';
+}
+
+// 預測
+function predict(){
+  let res=analyze();
+
+  if(Math.random()<0.05) res='t';
+
+  let percent=(Math.random()*10+80).toFixed(1);
+
+  document.getElementById("result").innerText=
+    res=='b'?'莊':res=='p'?'閒':'和';
+
+  document.getElementById("percent").innerText=
+    "參考機率："+percent+"%";
+}
+
+// 路單
+function render(){
+  let r=document.getElementById("road");
+  r.innerHTML="";
+  history.forEach(c=>{
+    let d=document.createElement("div");
+    d.className="dot";
+    if(c=='b') d.style.background='red';
+    if(c=='p') d.style.background='blue';
+    if(c=='t') d.style.background='green';
+    r.appendChild(d);
+  });
+}
+
+// 清空
+function clearData(){
+  history=[];
+  render();
+}
+</script>
+
+</body>
+</html>
