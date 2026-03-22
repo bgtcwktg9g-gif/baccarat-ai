@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百家樂 LIVE 無暇版</title>
+
+<style>
+body{margin:0;background:#020617;font-family:-apple-system;color:white}
+
+/* 面板 */
+.panel{
+ position:fixed;top:80px;right:10px;width:340px;
+ background:rgba(15,23,42,.95);
+ border-radius:20px;
+ box-shadow:0 0 40px rgba(0,0,0,.7);
+ backdrop-filter:blur(10px);
+ z-index:9999;
+}
+
+/* header */
+.header{
+ padding:12px;
+ display:flex;justify-content:space-between;
+ background:#000;border-radius:20px 20px 0 0;
+ font-weight:bold;
+}
+
+/* 房間 */
+.rooms{display:flex;gap:5px;padding:10px}
+.room{flex:1;background:#1f2937;padding:8px;border-radius:10px;font-size:12px}
+
+/* 按鈕 */
+.btn{padding:10px;border:none;border-radius:10px;color:#fff;font-weight:bold}
+.b{background:#ef4444}.p{background:#3b82f6}.t{background:#22c55e}.g{background:#374151}
+
+/* 大路 */
+.road{
+ display:grid;grid-template-columns:repeat(12,1fr);
+ gap:4px;padding:10px;
+}
+.dot{width:24px;height:24px;border-radius:50%}
+.bdot{background:red}.pdot{background:blue}.tdot{background:green}
+
+/* 小路 */
+.small{
+ display:flex;gap:4px;padding:0 10px 10px;
+}
+.s{width:8px;height:8px;border-radius:50%}
+.sb{background:red}.sp{background:blue}
+
+/* 近況條 */
+.bar{display:flex;gap:3px;padding:5px 10px}
+.bar div{width:14px;height:14px;border-radius:50%}
+
+/* AI */
+.ai{padding:10px;text-align:center;color:#00ffc3;font-size:14px}
+
+</style>
+</head>
+
+<body>
+
+<div class="panel" id="panel">
+
+<div class="header">
+ 🔥 無暇版
+ <button onclick="toggle()">☰</button>
+</div>
+
+<div id="body">
+
+<div class="rooms">
+ <div class="room" onclick="switchRoom('A')">性感荷官A</div>
+ <div class="room" onclick="switchRoom('B')">真人發牌B</div>
+ <div class="room" onclick="switchRoom('C')">VIP桌C</div>
+</div>
+
+<div style="display:flex;gap:5px;padding:10px;">
+ <button class="btn b" onclick="add('b')">莊</button>
+ <button class="btn p" onclick="add('p')">閒</button>
+ <button class="btn t" onclick="add('t')">和</button>
+</div>
+
+<div style="display:flex;gap:5px;padding:0 10px;">
+ <button class="btn g" onclick="undo()">返回</button>
+ <button class="btn g" onclick="clearAll()">清空</button>
+</div>
+
+<div class="ai" id="ai">AI分析中...</div>
+
+<div class="bar" id="bar"></div>
+
+<div class="road" id="road"></div>
+
+<div class="small" id="small"></div>
+
+</div>
+</div>
+
+<script>
+let rooms={A:[],B:[],C:[]}
+let current="A"
+
+/* 切房 */
+function switchRoom(r){current=r;render()}
+
+/* 新增 */
+function add(x){rooms[current].push(x);render()}
+
+/* 返回 */
+function undo(){rooms[current].pop();render()}
+
+/* 清空 */
+function clearAll(){rooms[current]=[];render()}
+
+/* 大路 */
+function build(){
+ let data=rooms[current],cols=[],col=[]
+ for(let i=0;i<data.length;i++){
+  if(i==0){col.push(data[i]);continue}
+  if(data[i]==data[i-1]) col.push(data[i])
+  else{cols.push(col);col=[data[i]]}
+ }
+ if(col.length) cols.push(col)
+ return cols
+}
+
+/* 小路 */
+function small(){
+ let d=rooms[current],arr=[]
+ for(let i=1;i<d.length;i++){
+  if(d[i]==d[i-1]) arr.push(d[i])
+ }
+ return arr.slice(-20)
+}
+
+/* 渲染 */
+function render(){
+ renderRoad();renderBar();renderSmall();analyze()
+}
+
+/* 畫大路 */
+function renderRoad(){
+ let road=document.getElementById("road")
+ road.innerHTML=""
+ let cols=build()
+ cols.forEach((c,x)=>{
+  c.forEach((v,y)=>{
+   let d=document.createElement("div")
+   d.className="dot "+(v=="b"?"bdot":v=="p"?"pdot":"tdot")
+   d.style.gridColumn=x+1
+   d.style.gridRow=y+1
+   road.appendChild(d)
+  })
+ })
+}
+
+/* 近況 */
+function renderBar(){
+ let bar=document.getElementById("bar")
+ bar.innerHTML=""
+ rooms[current].slice(-20).forEach(v=>{
+  let d=document.createElement("div")
+  d.style.background=v=="b"?"red":v=="p"?"blue":"green"
+  bar.appendChild(d)
+ })
+}
+
+/* 小路畫 */
+function renderSmall(){
+ let s=document.getElementById("small")
+ s.innerHTML=""
+ small().forEach(v=>{
+  let d=document.createElement("div")
+  d.className="s "+(v=="b"?"sb":"sp")
+  s.appendChild(d)
+ })
+}
+
+/* 分析 */
+function analyze(){
+ let d=rooms[current]
+ if(d.length<3){ai.innerText="資料不足";return}
+
+ let last=d[d.length-1]
+ let count=0
+ for(let i=d.length-1;i>=0;i--){
+  if(d[i]==last) count++
+  else break
+ }
+
+ if(count>=3) ai.innerText="⚠️ 可能轉向"
+ else ai.innerText="📈 延續機率高"
+}
+
+/* 收合 */
+function toggle(){
+ let b=document.getElementById("body")
+ b.style.display=b.style.display=="none"?"block":"none"
+}
+</script>
+
+</body>
+</html>
