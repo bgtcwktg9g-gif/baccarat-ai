@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百家樂AI</title>
+</head>
+
+<body style="background:black;color:white;text-align:center;font-family:sans-serif;">
+
+<h1>🎰 百家樂AI 預測</h1>
+
+<button onclick="run()" style="padding:20px;font-size:20px;">開始預測</button>
+
+<h2 id="r">等待中...</h2>
+
+<script>
+function run(){
+  let r=Math.random();
+  if(r<0.45){
+    document.getElementById("r").innerText="莊";
+  }else if(r<0.9){
+    document.getElementById("r").innerText="閒";
+  }else{
+    document.getElementById("r").innerText="和";
+  }
+}
+</script>
+
+</body>
+</html>
